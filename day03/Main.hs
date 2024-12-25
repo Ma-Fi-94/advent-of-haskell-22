@@ -24,8 +24,6 @@ findCommon string = head . filter (`elem` half2) $ half1
 findCommon' :: [String] -> Char
 findCommon' = head . foldl1 intersect
 
-
-
 main :: IO ()
 main = do
     inputLines <- lines <$> readFile "input.txt"
