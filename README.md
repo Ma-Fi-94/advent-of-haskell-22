@@ -5,4 +5,4 @@ Doing 2022's AoC in Haskell, again! Because 2024 is over, and I need my fix!
 
 |Day|Stars|Time [ms] (mean ± SD, n=5)
 |---|-----|----
-|1|⭐️⭐️|29±2
+|1|⭐️⭐️|29±1.6
