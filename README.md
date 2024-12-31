@@ -15,3 +15,4 @@ Doing 2022's AoC in Haskell, again! Because 2024 is over, and I need my fix!
 |8|⭐️⭐️|55±0.9
 |9|⭐️⭐️|43±0.5
 |10|⭐️⭐️|29±0.5
+|11|⭐️ |28±0.4, 
