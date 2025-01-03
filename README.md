@@ -1,9 +1,12 @@
 # advent-of-haskell-22-reprise
-Doing 2022's AoC in Haskell, again! Because 2024 is over, and I need my fix! 
+
+Doing 2022's AoC in Haskell, again! Because 2024 is over, and I need my fix!
+
+Also trying to achieve sub-second runtime for every single day, because that nudges me to think more deeply about everything. Performance is measured after compiling with -O3 and executing five times on my system (Apple MacBook with M2 Max processor, 32 GB RAM.)
 
 ## Progress so far
 
-|Day|Stars|Time [ms] (mean ± SD, n=5)
+|Day|Stars|Time [ms] (mean ± SD)
 |---|-----|----
 |1|⭐️⭐️|29±1.6
 |2|⭐️⭐️|29±0.5
