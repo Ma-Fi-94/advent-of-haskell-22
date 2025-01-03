@@ -1,7 +1,7 @@
 module Main where
 
-import qualified Data.Set as Set
-import Data.List ((\\))
+import Range (Range(..))
+import qualified Range as R
 import Utils (readInt, tok)
 
 type Coord   = (Int, Int)
@@ -22,23 +22,27 @@ cab (x1, y1) (x2, y2) = abs (x2 - x1) + abs (y2 - y1)
 -- Given a line number and one reading, calculate which columns in that
 -- row are free. Note that we need to exclude the point of the beacon
 -- if the beacon lies on the line we examine.
-findFreeCols                        :: Int -> Reading -> [Int]
+findFreeCols                        :: Int -> Reading -> [Range Int]
 findFreeCols y ((sx, sy), (bx, by)) = if   y == by
-                                      then xs \\ [bx]
-                                      else xs
+                                      then bx `R.remove` R (sx - dxMax) (sx + dxMax)
+                                      else [R (sx - dxMax) (sx + dxMax)]
   where
     r     = cab (sx, sy) (bx, by)
     dy    = abs (y - sy)
     dxMax = r - dy
-    xs    = [(sx - dxMax) .. (sx + dxMax)]
 
 main :: IO ()
 main = do
     readings <- map parseLine . lines <$> readFile "input.txt"
 
+
     -- Part 1
-    print $ Set.size . Set.unions . map Set.fromList 
-          $ map (findFreeCols 2000000) readings
+    let allRanges = concatMap (findFreeCols 2000000) readings
+    print . sum
+          . map (\ (R a b) -> b - a + 1)
+          $ foldl R.disjunctJoin [] allRanges
+
 
 
     print $ "Done."
+
