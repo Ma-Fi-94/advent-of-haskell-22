@@ -1,7 +1,8 @@
 module Main where
 
+import qualified Data.Set as Set
 import Data.List ((\\))
-import Utils (countUnique, readInt, tok)
+import Utils (readInt, tok)
 
 type Coord   = (Int, Int)
 type Sensor  = Coord
@@ -36,7 +37,8 @@ main = do
     readings <- map parseLine . lines <$> readFile "input.txt"
 
     -- Part 1
-    print $ countUnique . concatMap (findFreeCols 2000000) $ readings
+    print $ Set.size . Set.unions . map Set.fromList 
+          $ map (findFreeCols 2000000) readings
+
 
     print $ "Done."
-
