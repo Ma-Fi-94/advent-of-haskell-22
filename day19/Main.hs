@@ -120,11 +120,11 @@ setsMerge sets = foldl setMerge Set.empty sets
 -- lower bound 50% and more below the maximum.
 -- We only start pruning if we have <10 time steps remaining.
 prune :: Int -> Set State -> Set State
-prune tRem states = Set.filter ((>=cutoff) . bound) states
+prune tRem states = if   tRem < 10
+                    then Set.filter ((>=cutoff) . bound) states
+                    else states
   where
-    cutoff = if tRem < 10
-             then (`div` 2) . maximum . map bound . Set.elems $ states
-             else 0
+    cutoff = (`div` 2) . maximum . map bound . Set.elems $ states
     bound  = (\ (ressources, robots) -> (ressources !! 3) + tRem * (robots !! 3))
 
 -- Count the number of geodes a blueprint can produce at maximum
