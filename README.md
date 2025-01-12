@@ -26,3 +26,4 @@ Also trying to achieve sub-second runtime for every single day, because that nud
 |16|⭐️⭐️|~500s😱
 |17|⭐️⭐️|130±0.9
 |18|⭐️⭐️|92±0.9
+|19|⭐️⭐️|3995±16.1😒
