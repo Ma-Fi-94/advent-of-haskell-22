@@ -4,8 +4,6 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Utils (filterP, mapAt, readInt, tok)
 
-import Debug.Trace (trace)
-
 ----------------
 -- Some sugar --
 ----------------
@@ -46,8 +44,8 @@ boolPoss blueprint (ressources, _) = map checkRobot blueprint
 
 -- Check if state 1 is equal to or worse than state 2, i.e.
 -- if the numbers of *all* ressources and robots are <=.
-lesseq :: State -> State -> Bool
-lesseq (ress1, robos1) (ress2, robos2) = and
+worse :: State -> State -> Bool
+worse (ress1, robos1) (ress2, robos2) = and
                                        . zipWith (<=) (ress1 ++ robos1)
                                        $ (ress2 ++ robos2)
 
@@ -95,24 +93,39 @@ nextStates blueprint state@(ressources, robots)
             re' = zipWith (-) re (blueprint !! i)
             rb' = mapAt i (+1) robots
 
--- Count the number of geodes a blueprint can produce at maximum
-geodes :: Int -> Blueprint -> Int
-geodes tmax bp = go [([0,0,0,0],[1,0,0,0])] tmax
-  where
-    go :: [State] -> Int -> Int
-    go states 0    = maximum $ map ((!!3) . fst) states
-    go states time = trace (show time ++ ": " ++ show (length (states))) go states' (time-1)
-      where
-        states'   = eliminate $ concat $ map (nextStates bp) $ states
 
--- Eliminate all states that are lesseq than at least one other state in the list
-eliminate :: [State] -> [State]
-eliminate states = go [] states []
+-- A merge function for two sets of State-s. The first Set is assumed
+-- to not contain any states which are worse than any other one.
+-- All states in the second Set are then checked:
+-- If the state is worse than any state in the first Set, it is not added.
+-- If it is better than any state in the first Set, it is added, and all
+-- worse states from the first Set are dropped.
+setMerge :: Set State -> Set State -> Set State
+setMerge set1 set2 = go set1 (Set.elems set2)
   where
-    go _ [] accum = accum
-    go done queue@(q:qs) accum
-      |or (map (\q2 -> lesseq q q2) (done++qs)) = go (q:done) qs accum
-      |otherwise                                = go (q:done) qs (q:accum)
+    go s1 []     = s1
+    go s1 (s:ss) = go s1' ss
+      where
+        s1' = if   (s `worse`) `any` s1
+              then s1
+              else Set.insert s . Set.filter (not . (`worse` s)) $ s1
+
+-- And the same for a list of Sets
+setsMerge :: [Set State] -> Set State
+setsMerge sets = foldl setMerge Set.empty sets
+
+-- Count the number of geodes a blueprint can produce at maximum
+nbGeodes :: Int -> Blueprint -> Int
+nbGeodes tmax blueprint = go (Set.singleton ([0,0,0,0],[1,0,0,0])) tmax
+  where
+    go :: Set State -> Int -> Int
+    go states 0 = maximum . map ((!!3) . fst) $ Set.elems states
+    go states t = go states' (t - 1)
+      where
+        states'   = setsMerge
+                  . map (Set.fromList . nextStates blueprint)
+                  $ Set.elems states
+
 
 main :: IO ()
 main = do
@@ -121,12 +134,12 @@ main = do
     -- Part 1
     print . sum
           . zipWith (*) [1..]
-          . map (geodes 24)
+          . map (nbGeodes 24)
           $ blueprints
 
     -- Part 2
     print . foldl1 (*)
-          . map (geodes 32)
+          . map (nbGeodes 32)
           $ take 3 blueprints
 
     print $ "Done."
