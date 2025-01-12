@@ -46,8 +46,8 @@ boolPoss blueprint (ressources, _) = map checkRobot blueprint
 -- if the numbers of *all* ressources and robots are <=.
 worse :: State -> State -> Bool
 worse (ress1, robos1) (ress2, robos2) = and
-                                       . zipWith (<=) (ress1 ++ robos1)
-                                       $ (ress2 ++ robos2)
+                                      . zipWith (<=) (ress1 ++ robos1)
+                                      $ (ress2 ++ robos2)
 
 -------------   
 -- Parsing --
@@ -114,6 +114,19 @@ setMerge set1 set2 = go set1 (Set.elems set2)
 setsMerge :: [Set State] -> Set State
 setsMerge sets = foldl setMerge Set.empty sets
 
+-- Some additional pruning. Needs number of time steps remaining.
+-- For every state, we calculate a lower bound of the number of geodes
+-- produced at the end of the game. Then, we remove all states with a
+-- lower bound 50% and more below the maximum.
+-- We only start pruning if we have <10 time steps remaining.
+prune :: Int -> Set State -> Set State
+prune tRem states = Set.filter ((>=cutoff) . bound) states
+  where
+    cutoff = if tRem < 10
+             then (`div` 2) . maximum . map bound . Set.elems $ states
+             else 0
+    bound  = (\ (ressources, robots) -> (ressources !! 3) + tRem * (robots !! 3))
+
 -- Count the number of geodes a blueprint can produce at maximum
 nbGeodes :: Int -> Blueprint -> Int
 nbGeodes tmax blueprint = go (Set.singleton ([0,0,0,0],[1,0,0,0])) tmax
@@ -122,10 +135,10 @@ nbGeodes tmax blueprint = go (Set.singleton ([0,0,0,0],[1,0,0,0])) tmax
     go states 0 = maximum . map ((!!3) . fst) $ Set.elems states
     go states t = go states' (t - 1)
       where
-        states'   = setsMerge
+        states'   = prune t
+                  . setsMerge
                   . map (Set.fromList . nextStates blueprint)
                   $ Set.elems states
-
 
 main :: IO ()
 main = do
