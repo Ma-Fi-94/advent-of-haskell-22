@@ -28,3 +28,4 @@ Also trying to achieve sub-second runtime for every single day, because that nud
 |18|⭐️⭐️|92±0.9
 |19|⭐️⭐️|3995±16.1😒
 |20|⭐️⭐️|5358±33.0😒
+|21|⭐️⭐️|1886±6.1😒
