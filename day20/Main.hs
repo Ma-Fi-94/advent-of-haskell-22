@@ -2,20 +2,12 @@ module Main where
 
 import Data.List (elemIndex)
 import Data.Maybe (fromJust)
-import Utils (mapAt, pop, push, readInt, tok)
+import Utils ((%%), mapAt, pop, push, readInt, tok)
 
 
 -- Some sugar for clarity
 type Index = Int
 type Delta = Int
-
--- Helper to get the positive modulus of a number,
--- which we need to calculate the new index of a
--- list element
-(%%) :: Int -> Int -> Int
-a %% b
-    | a >= 0 = a `rem` b
-    | a < 0  = (a `rem` b) + b
 
 -- Shift element at given index by the given delta.
 shift :: Index -> Delta -> [a] -> [a]
@@ -39,10 +31,13 @@ mixN n xs = map snd . (!!n) . iterate (go 0) $ (zip [0..] xs)
         | ctr == length xs = xs
         | otherwise        = go (ctr + 1) xs'
           where
-            curEntry = head . filter (\ t -> fst t == ctr) $ xs
-            idx      = fromJust $ elemIndex curEntry xs
-            delta    = snd curEntry 
-            xs'      = shift idx delta xs
+            -- TODO: linear search is inefficient, maybe switch to Map here instead?
+            curEntryWithIdx = head
+                            . filter (\ (_, t) -> fst t == ctr)
+                            $ zip [0..] xs
+            idx             = fst curEntryWithIdx
+            delta           = snd $ snd curEntryWithIdx
+            xs'             = shift idx delta xs
 
 
 
@@ -54,7 +49,6 @@ coords xs = foldl1 (+) [xs !! idx1, xs !! idx2, xs !! idx3]
     idx1    = (zeroIdx + 1000) `mod` length xs
     idx2    = (zeroIdx + 2000) `mod` length xs
     idx3    = (zeroIdx + 3000) `mod` length xs
-
 
 
 main :: IO ()
@@ -71,4 +65,3 @@ main = do
           $ input
 
     print $ "Done."
-
