@@ -31,7 +31,6 @@ mixN n xs = map snd . (!!n) . iterate (go 0) $ (zip [0..] xs)
         | ctr == length xs = xs
         | otherwise        = go (ctr + 1) xs'
           where
-            -- TODO: linear search is inefficient, maybe switch to Map here instead?
             curEntryWithIdx = head
                             . filter (\ (_, t) -> fst t == ctr)
                             $ zip [0..] xs
