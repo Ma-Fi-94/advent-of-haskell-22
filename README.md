@@ -1,4 +1,4 @@
-# advent-of-haskell-22-reprise
+# advent-of-haskell-22
 
 Doing 2022's AoC in Haskell, again! Because 2024 is over, and I need my fix!
 
