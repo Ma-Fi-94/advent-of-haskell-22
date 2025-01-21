@@ -3,7 +3,7 @@ module Main where
 import Data.Set (Set)
 import qualified Data.Set as Set
 import qualified Grid as Grid
-import Utils (singletons)
+import Utils (ordSingletons)
 
 data Direction = N | S | W | E deriving (Show, Eq)
 type Row       = Int
@@ -59,7 +59,7 @@ step elves directions = Set.fromList (go posOld posProp)
   where
     posOld       = Set.elems elves
     posProp      = map (propose elves directions) posOld
-    posPropValid = Set.fromList . singletons $ posProp
+    posPropValid = Set.fromList . ordSingletons $ posProp
     go []         []                 = []
     go (old:olds) (new:news)
         | new `Set.member` posPropValid = new : go olds news
